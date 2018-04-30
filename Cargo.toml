@@ -1,0 +1,14 @@
+[package]
+name = "lateinit"
+version = "0.1.0"
+authors = ["Nathan Perry <avaglir@gmail.com>"]
+description = "Unsafe late-initialization for statics."
+license = "MIT"
+homepage = "https://github.com/mammothbane/lateinit"
+repository = "https://github.com/mammothbane/lateinit"
+keywords = ["lateinit", "no_std"]
+readme = "README.md"
+include = ["Cargo.toml", "src/**/*.rs", "LICENSE", "README.md"]
+
+[features]
+unchecked = []
