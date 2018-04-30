@@ -1,5 +1,8 @@
 # lateinit
 
+[![Docs](https://docs.rs/lateinit/badge.svg)](https://docs.rs/lateinit)
+[![Latest](https://img.shields.io/crates/v/lateinit.svg)](https://crates.io/crates/lateinit)
+
 **Disclaimer**: this crate breaks Rust's safety guarantees. You should probably be using [`spin::Once`](https://mvdnes.github.io/rust-docs/spin-rs/spin/struct.Once.html), 
 [`std::sync::Once`](https://doc.rust-lang.org/nightly/std/sync/struct.Once.html), or 
 [`lazy_static`](https://github.com/rust-lang-nursery/lazy-static.rs) instead. If you're sure you 
