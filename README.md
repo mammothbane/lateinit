@@ -28,9 +28,9 @@ fn main() {
 }
 ```
 
-This crate should be used sparingly and carefully&mdash;it breaks Rust's safety guarantees.
-It's on you to ensure that you initialize your `LateInit`s before accessing. Bad things™ will 
-happen otherwise. It's heavily suggested that you initialize only in a clearly demarcated region
+This crate should be used sparingly and carefully&mdash;it breaks safety because it does not ensure
+initialization before access. It's on you (the programmer) to ensure this. Bad things™ will 
+happen if you don't. It's heavily suggested that you initialize only in a clearly demarcated region
 of setup code.
 
 ## Features
