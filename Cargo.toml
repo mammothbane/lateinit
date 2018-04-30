@@ -1,6 +1,6 @@
 [package]
 name = "lateinit"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Nathan Perry <avaglir@gmail.com>"]
 description = "Unsafe late-initialization for statics."
 license = "MIT"
