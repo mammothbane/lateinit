@@ -1,6 +1,6 @@
 [package]
 name = "lateinit"
-version = "0.1.1"
+version = "0.2.0"
 authors = ["Nathan Perry <avaglir@gmail.com>"]
 description = "Unsafe late-initialization for statics."
 license = "MIT"
@@ -11,4 +11,4 @@ readme = "README.md"
 include = ["Cargo.toml", "src/**/*.rs", "LICENSE", "README.md"]
 
 [features]
-unchecked = []
+debug_unchecked = []

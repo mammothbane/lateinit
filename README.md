@@ -43,7 +43,5 @@ of setup code.
 ## Features
 `#[no_std]` is supported.
 
-By default, `init` asserts that it hasn't been called before, and there are `debug_assert`s in
-the `Deref` and `AsRef` implementations to catch potential errors while testing. If for some
-reason you want to turn these safety measures off, you can enable the `unchecked` feature flag 
-and they will be compiled out.
+There are `debug_assert`s in trait implementations (most relevantly in `Deref`) to catch errors while testing. 
+If you have performance concerns, you can turn off the `debug_assert`s with the `debug_unchecked` feature flag.

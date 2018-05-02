@@ -62,9 +62,7 @@ impl <T> LateInit<T> {
 
     /// Assign a value. Panics if called more than once.
     pub unsafe fn init(&self, value: T) {
-        #[cfg(not(feature = "unchecked"))] {
-            assert!(self.option().is_none(), "LateInit.init called more than once");
-        }
+        assert!(self.option().is_none(), "LateInit.init called more than once");
 
         *self.0.get() = Some(value);
     }
@@ -76,7 +74,7 @@ impl <T> LateInit<T> {
 
     #[inline(always)]
     fn data(&self) -> &T {
-        #[cfg(not(feature = "unchecked"))] {
+        #[cfg(not(feature = "debug_unchecked"))] {
             debug_assert!(self.option().is_some(), "LateInit used without initialization");
         }
 
@@ -94,7 +92,6 @@ impl <T: Clone> LateInit<T> {
     /// support mutation, so `clone_from` is impossible.
     #[inline(always)]
     pub fn clone(&self) -> T {
-        self.assert_option();
         self.data().clone()
     }
 }
@@ -180,6 +177,7 @@ mod test {
 
     #[test]
     #[should_panic]
+    #[cfg(not(feature = "debug_unchecked"))]
     fn multiple_init_panics() {
         let li = LateInit::<usize>::new();
         unsafe {
@@ -190,6 +188,7 @@ mod test {
 
     #[test]
     #[should_panic]
+    #[cfg(not(feature = "debug_unchecked"))]
     fn as_ref_panics() {
         let li = LateInit::<usize>::new();
         let _ = li.as_ref();
@@ -197,6 +196,7 @@ mod test {
 
     #[test]
     #[should_panic]
+    #[cfg(not(feature = "debug_unchecked"))]
     fn deref_panics() {
         let li = LateInit::<usize>::new();
         let _ = li.deref();
@@ -215,6 +215,7 @@ mod test {
 
     #[test]
     #[should_panic]
+    #[cfg(not(feature = "debug_unchecked"))]
     fn compare_panics() {
         let li = LateInit::<usize>::new();
         let _ = li > 4;
@@ -231,6 +232,7 @@ mod test {
 
     #[test]
     #[should_panic]
+    #[cfg(not(feature = "debug_unchecked"))]
     fn eq_panics() {
         let li = LateInit::<usize>::new();
         let _ = li == 4;
