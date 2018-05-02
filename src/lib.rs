@@ -4,7 +4,7 @@
 #![feature(optin_builtin_traits)]
 
 //! Provides an unsafe way to late-initialize static variables that will see a lot of use.
-//! Essentially a wrapper around `UnsafeCell` that only permits setting the contained value once.
+//! Meant as a replacement for `static mut` that only allows setting once.
 //!
 //! Usage:
 //!
@@ -51,7 +51,6 @@ use core::{
 //  Option<UnsafeCell>, so if performance is better one way or the other this may change.
 pub struct LateInit<T>(UnsafeCell<Option<T>>);
 
-// Sync is allowed
 unsafe impl <T> Sync for LateInit<T> {}
 impl <T> !Send for LateInit<T> {}
 
@@ -64,7 +63,7 @@ impl <T> LateInit<T> {
     /// Assign a value. Panics if called more than once.
     pub unsafe fn init(&self, value: T) {
         #[cfg(not(feature = "unchecked"))] {
-            assert!((*self.0.get()).is_none(), "LateInit.init called more than once");
+            assert!(self.option().is_none(), "LateInit.init called more than once");
         }
 
         *self.0.get() = Some(value);
@@ -77,16 +76,13 @@ impl <T> LateInit<T> {
 
     #[inline(always)]
     fn data(&self) -> &T {
+        #[cfg(not(feature = "unchecked"))] {
+            debug_assert!(self.option().is_some(), "LateInit used without initialization");
+        }
+
         match self.option() {
             Some(ref x) => x,
             _ => unreachable!(),
-        }
-    }
-
-    #[inline(always)]
-    fn assert_option(&self) {
-        #[cfg(not(feature = "unchecked"))] {
-            debug_assert!(self.option().is_some(), "LateInit used without initialization");
         }
     }
 }
@@ -109,7 +105,6 @@ impl <T> Deref for LateInit<T> {
     /// Deref to contained value. Panics in debug if called before initialization.
     #[inline(always)]
     fn deref(&self) -> &T {
-        self.assert_option();
         self.data()
     }
 }
@@ -118,7 +113,6 @@ impl <T> AsRef<T> for LateInit<T> {
     /// Panics in debug if called before initialization.
     #[inline(always)]
     fn as_ref(&self) -> &T {
-        self.assert_option();
         self.data()
     }
 }
@@ -126,40 +120,33 @@ impl <T> AsRef<T> for LateInit<T> {
 impl <T: PartialEq<W>, W> PartialEq<W> for LateInit<T> {
     #[inline(always)]
     fn eq(&self, other: &W) -> bool {
-        self.assert_option();
         self.data().eq(other)
     }
 
     #[inline(always)]
     fn ne(&self, other: &W) -> bool {
-        self.assert_option();
         self.data().ne(other)
     }
 }
 
 impl <T: PartialOrd<W>, W> PartialOrd<W> for LateInit<T> {
     fn partial_cmp(&self, other: &W) -> Option<Ordering> {
-        self.assert_option();
         self.data().partial_cmp(other)
     }
 
     fn lt(&self, other: &W) -> bool {
-        self.assert_option();
         self.data().lt(other)
     }
 
     fn le(&self, other: &W) -> bool {
-        self.assert_option();
         self.data().le(other)
     }
 
     fn gt(&self, other: &W) -> bool {
-        self.assert_option();
         self.data().gt(other)
     }
 
     fn ge(&self, other: &W) -> bool {
-        self.assert_option();
         self.data().ge(other)
     }
 }

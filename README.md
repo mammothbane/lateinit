@@ -5,18 +5,14 @@
 
 **Disclaimer**: this crate breaks Rust's safety guarantees. You should probably be using [`spin::Once`](https://mvdnes.github.io/rust-docs/spin-rs/spin/struct.Once.html), 
 [`std::sync::Once`](https://doc.rust-lang.org/nightly/std/sync/struct.Once.html), or 
-[`lazy_static`](https://github.com/rust-lang-nursery/lazy-static.rs) instead. If you're sure you 
-want zero-cost late initialization at the cost of safety, read on.
+[`lazy_static`](https://github.com/rust-lang-nursery/lazy-static.rs) instead.
 
 ```toml
 [dependencies]
 lateinit = "0.1"
 ```
 
-The `LateInit` type provides an unsafe interface for initializing static variables at runtime.
-Design goals for this crate are to provide checked, one-time initialization and unchecked, zero-cost
-access thereafter.
-
+## Example usage
 ```rust
 static SOMETHING: LateInit<String> = LateInit::new();
 
@@ -28,8 +24,19 @@ fn main() {
 }
 ```
 
-This crate should be used sparingly and carefully&mdash;it breaks safety because it does not ensure
-initialization before access. It's on you (the programmer) to ensure this. Bad things™ will 
+## Design 
+
+The `LateInit` type provides an unsafe interface for initializing static variables at runtime.
+Design goals for this crate are to provide checked, one-time initialization and unchecked, zero-cost
+access thereafter. The intention is to obviate the need for `static mut` in situations where only a 
+single mutation is required for initialization purposes.
+
+Methods like `is_initialized`, `init_once`, or similar are not and will not be supported because of the narrow
+scope of these design goals. If you need to check whether a `LateInit` is initialized, you're using it incorrectly.
+
+This crate should be used sparingly and carefully&mdash;it breaks safety because access is really `unsafe` 
+despite not being marked as such, since `lateinit` provides no guarantees about whether a value is initialized
+before it is used. It's on you (the programmer) to maintain this invariant. Bad things™ will 
 happen if you don't. It's heavily suggested that you initialize only in a clearly demarcated region
 of setup code.
 
