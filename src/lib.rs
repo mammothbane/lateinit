@@ -29,6 +29,11 @@
 
 use core::{
     ops::Deref,
+    cmp::{
+        PartialEq,
+        PartialOrd,
+        Ordering
+    },
     cell::UnsafeCell,
     clone::Clone,
     convert::AsRef,
@@ -77,6 +82,13 @@ impl <T> LateInit<T> {
             _ => unreachable!(),
         }
     }
+
+    #[inline(always)]
+    fn assert_option(&self) {
+        #[cfg(not(feature = "unchecked"))] {
+            debug_assert!(self.option().is_some(), "LateInit used without initialization");
+        }
+    }
 }
 
 impl <T: Clone> LateInit<T> {
@@ -86,10 +98,7 @@ impl <T: Clone> LateInit<T> {
     /// support mutation, so `clone_from` is impossible.
     #[inline(always)]
     pub fn clone(&self) -> T {
-        #[cfg(not(feature = "unchecked"))] {
-            debug_assert!(self.option().is_some(), "LateInit used without initialization");
-        }
-
+        self.assert_option();
         self.data().clone()
     }
 }
@@ -100,9 +109,7 @@ impl <T> Deref for LateInit<T> {
     /// Deref to contained value. Panics in debug if called before initialization.
     #[inline(always)]
     fn deref(&self) -> &T {
-        #[cfg(not(feature = "unchecked"))] {
-            debug_assert!(self.option().is_some(), "LateInit used without initialization");
-        }
+        self.assert_option();
         self.data()
     }
 }
@@ -111,10 +118,49 @@ impl <T> AsRef<T> for LateInit<T> {
     /// Panics in debug if called before initialization.
     #[inline(always)]
     fn as_ref(&self) -> &T {
-        #[cfg(not(feature = "unchecked"))] {
-            debug_assert!(self.option().is_some(), "LateInit used without initialization");
-        }
+        self.assert_option();
         self.data()
+    }
+}
+
+impl <T: PartialEq<W>, W> PartialEq<W> for LateInit<T> {
+    #[inline(always)]
+    fn eq(&self, other: &W) -> bool {
+        self.assert_option();
+        self.data().eq(other)
+    }
+
+    #[inline(always)]
+    fn ne(&self, other: &W) -> bool {
+        self.assert_option();
+        self.data().ne(other)
+    }
+}
+
+impl <T: PartialOrd<W>, W> PartialOrd<W> for LateInit<T> {
+    fn partial_cmp(&self, other: &W) -> Option<Ordering> {
+        self.assert_option();
+        self.data().partial_cmp(other)
+    }
+
+    fn lt(&self, other: &W) -> bool {
+        self.assert_option();
+        self.data().lt(other)
+    }
+
+    fn le(&self, other: &W) -> bool {
+        self.assert_option();
+        self.data().le(other)
+    }
+
+    fn gt(&self, other: &W) -> bool {
+        self.assert_option();
+        self.data().gt(other)
+    }
+
+    fn ge(&self, other: &W) -> bool {
+        self.assert_option();
+        self.data().ge(other)
     }
 }
 
