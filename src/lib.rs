@@ -214,4 +214,38 @@ mod test {
         let li = LateInit::<usize>::new();
         let _ = li.deref();
     }
+
+    #[test]
+    fn compare() {
+        let li = LateInit::<usize>::new();
+        unsafe { li.init(4); }
+
+        assert!(li > 3);
+        assert!(li < 5);
+        assert!(li >= 4);
+        assert!(li <= 4);
+    }
+
+    #[test]
+    #[should_panic]
+    fn compare_panics() {
+        let li = LateInit::<usize>::new();
+        let _ = li > 4;
+    }
+
+    #[test]
+    fn eq() {
+        let li = LateInit::<usize>::new();
+        unsafe { li.init(4); }
+
+        assert_eq!(li, 4);
+        assert_ne!(li, 5);
+    }
+
+    #[test]
+    #[should_panic]
+    fn eq_panics() {
+        let li = LateInit::<usize>::new();
+        let _ = li == 4;
+    }
 }
