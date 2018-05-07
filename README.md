@@ -9,7 +9,7 @@
 
 ```toml
 [dependencies]
-lateinit = "0.1"
+lateinit = "0.2"
 ```
 
 ## Example usage
